@@ -1,0 +1,6 @@
+[submodule "docs/yuescript-wasm"]
+	path = docs/yuescript-wasm
+	url = https://github.com/leodev-xyz/yuescript-wasm.git
+[submodule "docs/leadoc"]
+	path = docs/leadoc
+	url = https://github.com/leodev-xyz/leadoc.git

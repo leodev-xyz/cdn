@@ -1,0 +1,19 @@
+
+-- leadoc is not path, so add it
+package.path ..= ";./docs/leadoc/?.lua"
+
+import doc, fmt from require "leadoc.doc"
+import stringify from require "leadoc.json"
+
+
+file = ...
+
+local content
+with io.open file, "r"
+    content = \read "*a"
+    \close!
+
+doc = doc (load content)!, fmt
+
+export json = stringify doc.tree
+

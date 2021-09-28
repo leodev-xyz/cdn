@@ -1,0 +1,1192 @@
+
+export default (fmt) =>
+    @section "Globals", ->
+        @flag "globals"
+
+        @function "print", ->
+            @arg "...", "[]string"
+            @description "Prints all arguments seperated by tabs in the aimware console and in the csgo console."
+        
+        @function "LoadScript", ->
+            @arg "filename", "string"
+        
+        @function "UnloadScript", ->
+            @arg "filename", "string"
+
+        @function "GetScriptName", ->
+            @returns "string"
+
+        @namespace "entities", ->
+            @function "FindByClass", ->
+                @arg "name", "string"
+                @returns "[]Entity"
+                @description {
+                    "Returns a table with all matching entities." .. fmt.eol
+                    fmt.codeblock "lua", {
+                        'for _, ent in ipairs(entities.FindByClass("CSSPlayer"))' .. fmt.eol
+                        "  print(ent:GetName())" .. fmt.eol
+                        "end"
+                    }
+                }
+                @flag "TODO", "What if not connected?"
+
+
+            @function "GetLocalPlayer", ->
+                @returns "?Entity"
+            
+            @function "GetByIndex", ->
+                @arg "index", "integer"
+                @returns "?Entity"
+                @description {
+                    "Returns the entity matching the index." .. fmt.eol
+                }
+                @flag "TODO", "difference index and userid"
+            
+            @function "GetByUserID", ->
+                @arg "userid", "integer"
+                @returns "?Entity"
+            
+            @function "GetPlayerResources", ->
+                @returns "?Entity"
+                @description {
+                    "Returns the player resources entity. (useful for accessing the "
+                    fmt.code "CCSPlayerResource"
+                    " props)"
+                }
+        
+        @namespace "client", ->
+            @function "WorldToScreen", ->
+                @arg "pos", "Vector3"
+                @returns "[?integer, ?integer]"
+            
+            @function "Command", ->
+                @arg "command", "string"
+                @arg "unrestricted", "boolean", "false"
+                @description {
+                    "Executes command in the console." .. fmt.eol
+                    "You generally want to set "
+                    fmt.code "unrestricted"
+                    " to true."
+                }
+
+            @function "ChatSay", ->
+                @arg "message", "string"
+                @description "Says the message in global chat."
+            
+            @function "ChatTeamSay", ->
+                @arg "message", "string"
+                @description "Says the message in team chat."
+            
+            @function "AllowListener", ->
+                @arg "event", "string"
+                @description {
+                    "Allows the "
+                    fmt.reference {"Callbacks", "FireGameEvent"}, "FireGameEvent"
+                    " callback to listen to this event." .. fmt.eol
+                    "A list of available events: "
+                    fmt.link "https://wiki.alliedmods.net/Counter-Strike:_Global_Offensive_Events"
+                }
+            
+            @function "GetPlayerNameByIndex", ->
+                @arg "index", "integer"
+                @returns "?string"
+                @description {
+                    "Returns the name of the player." .. fmt.eol
+                    "Roughly equivalent to: " .. fmt.eol
+                    fmt.codeblock "lua", "entities.GetByIndex(index):GetName()"
+                }
+            
+            @function "GetPlayerNameByUserID", ->
+                @arg "userid", "integer"
+                @returns "?string"
+                @description {
+                    "Returns the name of the player." .. fmt.eol
+                    "Roughly equivalent to: " .. fmt.eol
+                    fmt.codeblock "lua", "entities.GetByUserID(index):GetName()"
+                }
+            
+            @function "GetPlayerInfo", ->
+                @arg "index", "integer"
+                @returns "PlayerInfo"
+            
+            @function "GetLocalPlayerIndex", ->
+                @returns "integer"
+            
+            @function "SetConVar", ->
+                @arg "name", "string"
+                @arg "value"
+                @arg "unrestricted", "boolean", false
+
+        @namespace "globals", ->    
+            @function "TickInterval", ->
+                @returns "?number"
+                @description "Time between each tick in seconds."
+
+            @function "TickCount", ->
+                @returns "?number"
+                @description "Current client tick."
+            
+            @function "RealTime", ->
+                @returns "number"
+                @description {
+                    "Time since the game started in seconds." .. fmt.eol
+                    fmt.info {
+                        "This can never go backwards. Use this for timers instead of "
+                        fmt.reference {"Globals", "globals", "CurTime"}, "globals.CurTime"
+                        "!"
+                    }
+                }
+            
+            @function "CurTime", ->
+                @returns "?number"
+                @description "Server time of last received tick."
+            
+            @function "FrameCount", ->
+                @returns "number"
+            
+            @function "FrameTime", ->
+                @returns "number"
+                @description {
+                    "Time last frame took to render." .. fmt.eol
+                    fmt.danger {
+                        "According to aimware documentation, this might return "
+                        fmt.reference {"Globals", "globals", "TickInterval"}
+                        " in some callbacks. Use "
+                        fmt.reference {"Globals", "globals", "AbsoluteFrameTime"}
+                        " instead."
+                    }
+                }
+            
+            @function "AbsoluteFrameTime", ->
+                @returns "number"
+                @description "Time last frame took to render."
+            
+            @function "MaxClients", ->
+                @returns "number"
+                @description "Max possible player connections to the server."
+
+        @namespace "callbacks", ->
+            @function "Register", ->
+                @arg "name", "string"
+                @arg "unique", "?string"
+                @arg "function", "function"
+                @description {
+                    "Registers the callback." .. fmt.eol
+                    "By specifying "
+                    fmt.code "unique"
+                    ", you can use "
+                    fmt.reference {"Globals", "callbacks", "Unregister"}, "callbacks.Unregister"
+                    " to unregister the callback later."
+                    fmt.eol .. fmt.eol
+                    "See also: "
+                    fmt.reference {"Callbacks"}, "Callbacks"
+                }
+            
+            @function "Unregister", ->
+                @arg "name", "string"
+                @arg "unique", "string"
+                
+        @namespace "draw", ->
+            @description {
+                fmt.danger {
+                    "These functions can only be called during the "
+                    fmt.reference {"Callbacks", "Draw"}
+                    " callback. (with the exception of "
+                    fmt.reference {"Globals", "draw", "GetScreenSize"}
+                    ")"
+                }
+            }
+
+            @function "Color", ->
+                @arg "r", "integer"
+                @arg "g", "integer"
+                @arg "b", "integer"
+                @arg "a", "integer"
+            
+            @function "Line", ->
+                @arg "x1", "integer"
+                @arg "y1", "integer"
+                @arg "x2", "integer"
+                @arg "y2", "integer"
+                @description "Draws a line with a thickness of 1 pixel."
+            
+            @function "FilledRect", ->
+                @arg "x1", "integer"
+                @arg "y1", "integer"
+                @arg "x2", "integer"
+                @arg "y2", "integer"
+
+            @function "OutlinedRect", ->
+                @arg "x1", "integer"
+                @arg "y1", "integer"
+                @arg "x2", "integer"
+                @arg "y2", "integer"
+                @description "Draws an outlined rectangle with an outline thickness of 1 pixel."
+            
+            @function "RoundedRect", ->
+                @arg "x1", "integer"
+                @arg "y1", "integer"
+                @arg "x2", "integer"
+                @arg "y2", "integer"
+
+                @arg "radius", "integer"
+                @arg "topleft", "boolean"
+                @arg "topright", "boolean"
+                @arg "bottomleft", "boolean"
+                @arg "bottomright", "boolean"
+
+                @flag "todo", "test this shit"
+            
+            @function "ShadowRect", ->
+                @arg "x1", "integer"
+                @arg "y1", "integer"
+                @arg "x2", "integer"
+                @arg "y2", "integer"
+                @arg "shadow", "integer"
+            
+            @function "Triangle", ->
+                @arg "x1", "integer"
+                @arg "y1", "integer"
+                @arg "x2", "integer"
+                @arg "y2", "integer"
+                @arg "x3", "integer"
+                @arg "y3", "integer"
+            
+            @function "FilledCircle", ->
+                @arg "x", "integer"
+                @arg "y", "integer"
+                @arg "radius", "integer"
+
+            @function "OutlinedCircle", ->
+                @arg "x", "integer"
+                @arg "y", "integer"
+                @arg "radius", "integer"
+                @description "Draws an outlined circle with an outlien thickness of 1 pixel."
+            
+            @function "GetTextSize", ->
+                @arg "text", "string"
+                @returns "[integer, integer]"
+            
+            @function "Text", ->
+                @arg "x", "integer"
+                @arg "y", "integer"
+                @arg "text", "string"
+            
+            @function "TextShadow", ->
+                @arg "x", "integer"
+                @arg "y", "integer"
+                @arg "text", "string"
+            
+            @function "GetScreenSize", ->
+                @returns "[integer, integer]"
+            
+            @function "CreateFont", ->
+                @arg "name", "string"
+                @arg "height", "integer"
+                @arg "weight", "integer"
+                @returns "Font"
+            
+            @function "AddFontResource", ->
+                @arg "ttf", "string"
+                @description "Adds font to available fonts."
+            
+            @function "SetFont", ->
+                @arg "font", "Font"
+            
+            @function "CreateTexture", ->
+                @arg "rgba", "[][integer, integer, integer, integer]"
+                @arg "width", "integer"
+                @arg "height", "integer"
+                @returns "Texture"
+            
+            @function "UpdateTexture", ->
+                @arg "texture", "Texture"
+                @arg "rgba", "[][integer, integer, integer]"
+            
+            @function "SetTexture", ->
+                @arg "texture", "?Texture"
+        
+        @namespace "common", ->
+            @function "Time", ->
+                @returns "number"
+                @description "Time since the cheat injected in seconds."
+            
+            @function "DecodePNG", ->
+                @arg "data", "string"
+                @returns "[[]integer, integer, integer]"
+            
+            @function "DecodeJPEG", ->
+                @arg "data", "string"
+                @returns "[[]integer, integer, integer]"
+
+            @function "RasterizeSVG", ->
+                @arg "data", "string"
+                @arg "scale", "number"
+                @returns "[[]integer, integer, integer]"
+        
+        @namespace "gui", ->
+            @function "GetValue", ->
+                @arg "varname", "string"
+                @returns "any"
+            
+            @function "SetValue", ->
+                @arg "varname", "string"
+                @arg "value"
+            
+            @function "Reference", ->
+                @arg "...", "[]string"
+                @returns "GuiObject"
+            
+            @function "Checkbox", ->
+                @arg "parent", "GuiObject"
+                @arg "varname", "string"
+                @arg "name", "string"
+                @arg "value", "boolean", "false"
+                @returns "GuiObject"
+            
+            @function "Slider", ->
+                @arg "parent", "GuiObject"
+                @arg "varname", "string"
+                @arg "name", "string"
+                @arg "value", "number"
+                @arg "min", "number"
+                @arg "max", "number"
+                @arg "step", "number", "1"
+                @returns "GuiObject"
+            
+            @function "Keybox", ->
+                @arg "parent", "GuiObject"
+                @arg "varname", "string"
+                @arg "name", "string"
+                @arg "key", "integer", "0"
+                @returns "GuiObject"
+            
+            @function "Combobox", ->
+                @arg "parent", "GuiObject"
+                @arg "varname", "string"
+                @arg "name", "string"
+                @arg "...", "[]string"
+                @returns "GuiObject"
+
+                @description {
+                    "Creates a combobox." .. fmt.eol
+                    fmt.codeblock "lua", {
+                        'local options = {"option 0", "option 1", "option 2", "option 3"}' .. fmt.eol
+                        'local combobox = gui.Combobox(parent, "example.combobox", "eaxmple combobox", unpack(options))' .. fmt.eol
+                        "local option = options[combobox:GetValue() + 1] -- + 1 because it's zero indexed"
+                    }
+                }
+
+            @function "Editbox", ->
+                @arg "parent", "GuiObject"
+                @arg "varname", "string"
+                @arg "value", "string"
+                @returns "GuiObject"
+
+            @function "Text", ->
+                @arg "parent", "GuiObject"
+                @arg "text", "string"
+                @returns "GuiObject"
+
+            @function "Groupbox", ->
+                @arg "parent", "GuiObject"
+                @arg "name", "string"
+                @arg "x", "integer"
+                @arg "y", "integer"
+                @arg "w", "integer"
+                @arg "h", "integer"
+                @returns "GuiObject"
+            
+            @function "ColorPicker", ->
+                @arg "parent", "GuiObject"
+                @arg "varname", "string"
+                @arg "name", "string"
+                @arg "r", "integer"
+                @arg "g", "integer"
+                @arg "b", "integer"
+                @arg "a", "integer"
+                @returns "GuiObject"
+            
+            @function "Window", ->
+                @arg "varname", "string"
+                @arg "name", "string"
+                @arg "x", "integer"
+                @arg "y", "integer"
+                @arg "w", "integer"
+                @arg "h", "integer"
+                @returns "GuiObject"
+            
+            @function "ColorPicker", ->
+                @arg "parent", "GuiObject"
+                @arg "name", "string"
+                @arg "callback", "function"
+                @returns "GuiObject"
+            
+            @function "Multibox", ->
+                @arg "parent", "GuiObject"
+                @arg "name", "string"
+                @returns "GuiObject"
+            
+            @function "Command", ->
+                @arg "command", "string"
+                @description {
+                    "Executes a command in the "
+                    fmt.bold "aimware"
+                    " console."
+                }
+            
+            @function "Custom", ->
+                @arg "parent", "GuiObject"
+                @arg "varname", "string"
+                @arg "x", "integer"
+                @arg "y", "integer"
+                @arg "w", "integer"
+                @arg "h", "integer"
+                @arg "update", "function"
+                @arg "write", "function"
+                @arg "read", "function"
+                @returns "GuiObject"
+
+                @flag "todo", "example"
+            
+            @function "Tab", ->
+                @arg "parent", "GuiObject"
+                @arg "name", "string"
+                @returns "GuiObject"
+            
+            @function "Listbox", ->
+                @arg "parent", "GuiObject"
+                @arg "varname", "string"
+                @arg "height", "integer"
+                @arg "...", "[]string"
+                @returns "GuiObject"
+
+            @function "XML", ->
+                @arg "xml", "string"
+                @flag "todo"
+
+        @namespace "input", ->
+            @function "GetMousePos", ->
+                @returns "[integer, integer]"
+
+            @function "IsButtonDown", ->
+                @arg "button", "integer"
+                @returns "boolean"
+
+            @function "IsButtonPressed", ->
+                @arg "button", "integer"
+                @returns "boolean"
+            
+            @function "GetMouseWheelDelta", ->
+                @returns "integer"
+        
+        @namespace "engine", ->
+            @function "TraceLine", ->
+                @arg "src", "Vector3"
+                @arg "dest", "Vector3"
+                @arg "mask", "integer"
+                @returns "Trace"
+            
+            @function "TraceHull", ->
+                @arg "src", "Vector3"
+                @arg "dest", "Vector3"
+                @arg "min", "Vector3"
+                @arg "max", "Vector3"
+                @arg "mask", "integer"
+                @returns "Trace"
+            
+            @function "GetPointContents", ->
+                @arg "x", "number"
+                @arg "y", "number"
+                @arg "z", "number"
+                @flag "todo", "return?"
+            
+            @function "GetMapName", ->
+                @returns "?string"
+            
+            @function "GetServerIP", ->
+                @returns "?string"
+                @description {
+                    "Server ip. "
+                    fmt.code "loopback"
+                    " when the server is selfhosted."
+                }
+            
+            @function "GetViewAngles", ->
+                @returns "?EulerAngles"
+            
+            @function "SetViewAngles", ->
+                @arg "angles", "EulerAngles"
+        
+        @namespace "file", ->
+            @function "Open", ->
+                @arg "filename", "string"
+                @arg "mode", "string"
+                @returns "File"
+                @description {
+                    fmt.danger {
+                        "Do not open a file in read mode that does not exist." .. fmt.eol
+                        "The script will immediately die!" .. fmt.eol
+                        "Use "
+                        fmt.reference {"Globals", "file", "Enumerate"}, "file.Enumerate"
+                        " to check if the file exists first."
+                    }
+                }
+            
+            @function "Delete", ->
+                @arg "filename", "string"
+            
+            @function "Enumerate", ->
+                @arg "callback", "function"
+                @description "The callback is called for and with every filename found in the cheat directory."
+
+            @function "Write", ->
+                @arg "filename", "string"
+                @arg "content", "string"
+            
+            @function "Read", ->
+                @arg "filename", "string"
+                @returns "string"
+                @description {
+                    fmt.danger {
+                        "Do not call this function if the file does not exist." .. fmt.eol
+                        "The script will immediately die!" .. fmt.eol
+                        "Use "
+                        fmt.reference {"Globals", "file", "Enumerate"}, "file.Enumerate"
+                        " to check if the file exists first."
+                    }
+                }
+            
+        @namespace "http", ->
+            @function "Get", ->
+                @arg "url", "string"
+                @arg "callback", "?function"
+                @returns "?string"
+                @description {
+                    "This function will won't return a string if a callback is specified."
+                    fmt.danger {
+                        "The entire game is frozen while fetching the ressource when no callback is specified." .. fmt.eol
+                        "It is VERY recommended to NOT call this function without a callback."
+                    }
+                }
+            
+            @function "Post", ->
+                @arg "url", "string"
+                @arg "data", "string"
+                @arg "callback", "?function"
+                @returns "?string"
+                @description {
+                    "Same disclaimer as for "
+                    fmt.reference {"Globals", "http", "Get"}, "http.Get"
+                    "."
+                }
+        
+        @namespace "vector", ->
+            @function "Add", ->
+                @arg "v1", "[number, number, number]"
+                @arg "v1", "[number, number, number]"
+                @returns "[number, number, number]"
+
+            @function "Subtract", ->
+                @arg "v1", "[number, number, number]"
+                @arg "v1", "[number, number, number]"
+                @returns "[number, number, number]"
+
+            @function "Multiply", ->
+                @arg "v1", "[number, number, number]"
+                @arg "v1", "[number, number, number]"
+                @returns "[number, number, number]"
+
+            @function "Divide", ->
+                @arg "v1", "[number, number, number]"
+                @arg "v1", "[number, number, number]"
+                @returns "[number, number, number]"
+
+            @function "Length", ->
+                @arg "v1", "[number, number, number]"
+                @arg "v1", "[number, number, number]"
+                @returns "number"
+
+            @function "LengthSqr", ->
+                @arg "v1", "[number, number, number]"
+                @arg "v1", "[number, number, number]"
+                @returns "number"
+
+            @function "Distance", ->
+                @arg "v1", "[number, number, number]"
+                @arg "v1", "[number, number, number]"
+                @returns "number"
+
+            @function "Normalize", ->
+                @arg "v1", "[number, number, number]"
+                @arg "v1", "[number, number, number]"
+                @returns "[number, number, number]"
+            
+            @function "Angles", ->
+                @arg "angle", "EulerAngles"
+                @flag "todo", "WHAT"
+            
+            @function "AngleForward", ->
+                @arg "angle", "EulerAngles"
+                @flag "todo", "WHAT"
+            
+            @function "AngleRight", ->
+                @arg "angle", "EulerAngles"
+                @flag "todo", "WHAT"
+            
+            @function "AngleUp", ->
+                @arg "angle", "EulerAngles"
+                @flag "todo", "WHAT"
+            
+            @function "AngleNormalize", ->
+                @arg "angle", "EulerAngles"
+                @flag "todo", "WHAT"
+        
+        @namespace "network", ->
+            @function "GetAddrInfo", ->
+                @arg "name", "string"
+                @returns "?string"
+            
+            @function "GetNameInfo", ->
+                @arg "address", "string"
+                @returns "?string"
+        
+        @namespace "panorama", ->
+            @function "RunScript", ->
+                @arg "script", "string"
+                @description {
+                    "Panorama API: "
+                    fmt.link "https://developer.valvesoftware.com/wiki/CSGO_Panorama_API", "CS:GO Panorama API"
+                }
+        
+        @namespace "cheat", ->
+            @function "IsFakeDucking", ->
+                @returns "boolean"
+            
+            @function "RequestSpeedBurst", ->
+                @description "Something double tap related, I guess?"
+
+    @section "Callbacks", ->
+        @flag "dont_validate"
+
+        @text {
+            fmt.danger {
+                "Do not return anything from callbacks!" .. fmt.eol
+                "Returning something will corrupt the arguments that the callback will be called with in the future."
+            }
+        }
+
+        @function "Draw", ->
+            @description {
+                "Called every frame for drawing." .. fmt.eol
+                "Accessible during this callback: "
+                fmt.reference {"Globals", "Render"}, "Render"
+                "."
+            }
+        
+        @function "DrawESP", ->
+            @arg "builder", "EspBuilder"
+            @description "Called every frame for rendering for every entity."
+
+        @function "DrawModel", ->
+            @arg "builder", "DrawModelContext"
+            @description "Called every frame for rendering for every model."
+
+        @function "DrawGhostModel", ->
+            @arg "builder", "DrawModelContext"
+            @description "Called every frame for rendering for every ghost model."
+
+        @function "DrawBacktrackModel", ->
+            @arg "builder", "DrawModelContext"
+            @description "Called every frame for rendering for every backtrack model."
+
+        @function "CreateMove", ->
+            @arg "usercmd", "UserCmd"
+            @description "Called every tick."
+        
+        @function "FireGameEvent", ->
+            @arg "event", "GameEvent"
+            @description "Called for every event."
+        
+        @function "DispatchUserMessage", ->
+            @arg "message", "UserMessage"
+            @description "Called every time a user message is dispatched."
+        
+        @function "SendStringCmd", ->
+            @arg "stringcmd", "StringCmd"
+            @description "Called every time a string command is sent to the server."
+        
+        @function "AimbotTarget", ->
+            @arg "target", "?Entity"
+            @description {
+                "Called every time the legitbot/ragebot target switches." .. fmt.eol
+                "target will be nil if no entity is being targetted."
+            }
+        
+        @function "Unload", ->
+            @description {
+                "Called when the lua is unloaded." .. fmt.eol
+                "This is not guaranteed to be called when the game exits."
+            }
+
+    @section "Classes", ->
+        @flag "dont_validate"
+
+        @class "Entity", ->
+            @function "GetName", ->
+                @returns "string"
+            
+            @function "GetClass", ->
+                @returns "string"
+            
+            @function "GetIndex", ->
+                @returns "?integer"
+            
+            @function "GetTeamNumber", ->
+                @returns "?integer"
+                @description {
+                    "Team number" .. fmt.eol
+                    "1 = Spectator, 2 = CT, 3 = T"
+                }
+            
+            @function "GetAbsOrigin", ->
+                @returns "Vector3"
+                @description "Position in the world"
+            
+            @function "GetMins", ->
+                @flag "todo"
+            
+            @function "GetMaxs", ->
+                @flag "todo"
+            
+            @function "GetHealth", ->
+                @returns "integer"
+            
+            @function "GetMaxHealth", ->
+                @returns "integer"
+            
+            @function "IsPlayer", ->
+                @returns "boolean"
+            
+            @function "IsAlive", ->
+                @returns "boolean"
+            
+            @function "GetProp", ->
+                @arg "name", "string"
+                @returns "any"
+            
+            @function "SetProp", ->
+                @arg "name", "string"
+                @arg "value", "any"
+            
+            for {name, type} in *{{"Float", "float"}, {"Int", "integer"}, {"Bool", "boolean"}, {"String", "string"}, {"Vector", "Vector3"}, {"Entity", "Entity"}}
+                @function "GetProp#{name}", ->
+                    @arg "...", "[]string"
+                    @returns type
+                
+                @function "SetProp#{name}", ->
+                    @arg "value", type
+                    @arg "...", "[]string"
+                
+            @function "GetHitboxPosition", ->
+                @arg "hitbox", "integer"
+                @returns "Vector3"
+            
+            @function "GetBonePosition", ->
+                @arg "bone", "integer"
+                @returns "Vector3"
+            
+            @function "GetWeaponID", ->
+                @returns "integer"
+            
+            @function "GetWeaponType", ->
+                @returns "any"
+                @flag "todo"
+            
+            @function "GetWeaponSpread", ->
+                @returns "number"
+            
+            @function "GetWeaponInaccuracy", ->
+                @returns "number"
+        
+        @class "EspBuilder", ->
+            @function "Color", ->
+                @arg "r", "integer"
+                @arg "g", "integer"
+                @arg "b", "integer"
+                @arg "a", "integer"
+            
+            @function "GetEntity", ->
+                @returns "Entity"
+            
+            @function "GetRect", ->
+                @returns "any"
+                @flag "todo"
+            
+            for side in *{"Top", "Bottom", "Left", "Right"}
+                for {name, argname, argtype} in *{{"Text", "text", "string"}, {"Bar", "percentage", "float"}, {"Icon", "texture", "Texture"}}
+                    @function "Add#{name}#{side}", ->
+                        @arg argname, argtype
+
+        @class "UserCmd", ->
+            @flag "ref", "UserCmd"
+            for {varname, vartype, description} in *{
+                { "command_number", "integer" }
+                { "tick_count", "integer" }
+                { "viewangles", "EulerAngles" }
+                { "aimdirection", "Vector3" }
+                { "forwardmove", "integer" }
+                { "sidemove", "integer" }
+                { "upmove", "integer" }
+                { "buttons", "integer", "bitwise" }
+                { "impulse", "integer" }
+                { "weaponselect", "integer" }
+                { "weaponsubtype", "integer" }
+                { "random_seed", "integer" }
+                { "mousedx", "integer" }
+                { "mousedy", "integer" }
+                { "hasbeenpredicted", "boolean" }
+                { "headangles", "EulerAngles" }
+                { "headoffset", "Vector3" }
+                { "sendpacket", "boolean", "true=sent, false=choke" }
+            }
+                @variable varname, ->
+                    @type vartype or "any"
+                    @description description if description?
+            
+            for field in *{"ViewAngle", "SendPacket", "Buttons", "ForwardMove", "SideMove", "UpMove"}
+                @function "Set#{field}", ->
+                    @arg "...", "[]any"
+                    @flag "deprecated"
+                    @description {
+                        fmt.warn {
+                            "Deprecated; use "
+                            fmt.reference {@ref.UserCmd, field\lower!}, field\lower!
+                            " instead."
+                        }
+                    }
+                
+                @function "Get#{field}", ->
+                    @returns "any"
+                    @flag "deprecated"
+                    @description {
+                        fmt.warn {
+                            "Deprecated; use "
+                            fmt.reference {@ref.UserCmd, field\lower!}, field\lower!
+                            " instead."
+                        }
+                    }
+        
+        @class "GameEvent", ->
+            @description {
+                "For all game events, fields and types, see here: "
+                fmt.link "https://wiki.alliedmods.net/Counter-Strike:_Global_Offensive_Events"
+            }
+            @function "GetName", ->
+                @returns "string"
+                @description {
+                    "Returns the game event name (e.g. "
+                    fmt.code "player_hurt"
+                    ", "
+                    fmt.code "player_dead"
+                    ", "
+                    fmt.code "weapon_fire"
+                    " and many more)"
+                }
+            
+            for {name, type} in *{
+                {"String", "string"}
+                {"Int", "integer"}
+                {"Float", "float"}
+            }
+                @function "Get#{name}", ->
+                    @arg "field", "string"
+                    @returns type
+            
+        @class "GuiObject", ->
+            @function "GetName", ->
+                @returns "string"
+            
+            @function "SetValue", ->
+                @arg "...", "[]any"
+                @description {
+                    "This function takes a single "
+                    fmt.type "number"
+                    " unless it's a "
+                    fmt.reference {"Globals", "gui", "ColorPicker"}, "gui.ColorPicker"
+                    " in which case it takes "
+                    fmt.type "[integer, integer, integer, integer]"
+                    " for r, g, b, and a."
+                }
+            
+            @function "GetValue", ->
+                @returns "[]any"
+            
+            @function "SetOpenKey", ->
+                @arg "key", "number"
+                @description {
+                    "Sets the keybind for opening/closing the window." .. fmt.eol
+                    fmt.info {
+                        "Only for "
+                        fmt.reference {"Globals", "gui", "Window"}, "gui.Window"
+                        "."
+                    }
+                }
+            
+            @function "SetActive", ->
+                @arg "active", "boolean"
+                @description {
+                    "Makes the window appear or disappear." .. fmt.eol
+                    fmt.info {
+                        "Only for "
+                        fmt.reference {"Globals", "gui", "Window"}, "gui.Window"
+                        "."
+                    }
+                }
+            
+            @function "IsActive", ->
+                @returns "boolean"
+                @description {
+                    "Returns if the window is visible." .. fmt.eol
+                    fmt.info {
+                        "Only for "
+                        fmt.reference {"Globals", "gui", "Window"}, "gui.Window"
+                        "."
+                    }
+                }
+            
+            @function "SetText", ->
+                @arg "text", "string"
+                @description {
+                    "Sets the text." .. fmt.eol
+                    fmt.info {
+                        "Only for "
+                        fmt.reference {"Globals", "gui", "Text"}, "gui.Text"
+                        "."
+                    }
+                }
+            
+            @function "SetOptions", ->
+                @arg "...", "[]string"
+                @description {
+                    "Sets the options." .. fmt.eol
+                    fmt.info {
+                        "Only for "
+                        fmt.reference {"Globals", "gui", "Combobox"}, "gui.Combobox"
+                        " and "
+                        fmt.reference {"Globals", "gui", "Listbox"}, "gui.Listbox"
+                        "."
+                    }
+                }
+            
+            for {name, value, type} in *{
+                {"Description", "description", "string"}
+                {"PosX", "x", "integer"}
+                {"PosY", "y", "integer"}
+                {"Width", "width", "integer"}
+                {"Height", "height", "integer"}
+                {"Invisible", "invisibility", "boolean"}
+                {"Disabled", "disabled", "boolean"}
+            }
+                @function "Set#{name}", ->
+                    @arg value, type
+            
+            @function "Remove", ->
+                @description "Removes this gui object."
+            
+            @function "Reference", ->
+                @arg "...", "[]string"
+                @returns "?GuiObject"
+                @description {
+                    "Like "
+                    fmt.reference {"Globals", "gui", "Reference"}
+                    " but relative to this gui object."
+                }
+            
+            @function "Children", ->
+                @returns "function"
+                @description "Returns a generator for all children of this gui object."
+        
+        @class "File", ->
+            @function "Read", ->
+                @returns "string"
+                @description {
+                    fmt.info {
+                        "File must be opened in "
+                        fmt.code "r"
+                        " mode."
+                    }
+                }
+
+            @function "Write", ->
+                @arg "content", "string"
+                @description {
+                    fmt.info {
+                        "File must be opened in "
+                        fmt.code "w"
+                        " or "
+                        fmt.code "a"
+                        " mode."
+                    }
+                }
+
+            @function "Size", ->
+                @returns "integer"
+                @description {
+                    fmt.info {
+                        "File must be opened in "
+                        fmt.code "r"
+                        " mode."
+                    }
+                }
+            
+            @function "Close"
+        
+        @class "UserMessage", ->
+            @description {
+                fmt.link "https://github.com/SteamDatabase/Protobufs/blob/master/csgo/cstrike15_usermessages.proto", "User Message Protobuf"
+            }
+            @function "GetID", ->
+                @returns "integer"
+                @description {
+                    "Returns the "
+                    fmt.link "https://github.com/SteamDatabase/Protobufs/blob/master/csgo/cstrike15_usermessages.proto#L8-L83", "message id"
+                    "."
+                }
+            
+            for {name, type} in *{
+                {"Int", "integer"}
+                {"Float", "float"}
+                {"String", "string"}
+            }
+                @function "Get#{name}", ->
+                    @arg "...", "[]string"
+                    @returns "?#{type}"
+        
+        @class "StringCmd", ->
+            @function "Get", ->
+                @returns "string"
+            
+            @function "Set", ->
+                @arg "command", "string"
+                @description "If command is empty, the command will not be sent."
+        
+        @class "Socket", ->
+            @description {
+                fmt.info "UDP packets have a max packet size of 64kb."
+            }
+            @function "Bind", ->
+                @arg "ip", "string"
+                @arg "port", "integer"
+                @returns "boolean"
+            
+            @function "SendTo", ->
+                @arg "ip", "string"
+                @arg "port", "integer"
+                @arg "message", "string"
+            
+            @function "RecvFrom", ->
+                @arg "ip", "string"
+                @arg "port", "integer"
+                @arg "size", "integer"
+                @returns "?[string, string, integer]"
+            
+            @function "Close"
+        
+        @class "Material", ->
+            @function "GetName", ->
+                @returns "string"
+
+            @function "GetTextureGroupName", ->
+                @returns "string"
+            
+            @function "AlphaModulate", ->
+                @arg "alpha", "integer"
+            
+            @function "ColorModulate", ->
+                @arg "r", "integer"
+                @arg "g", "integer"
+                @arg "b", "integer"
+            
+            @function "SetMaterialVarFlag", ->
+                @arg "flag", "string"
+                @arg "value", "any"
+            
+            @function "SetShaderParam", ->
+                @arg "name", "string"
+                @arg "value", "any"
+                @description {
+                    fmt.link "https://developer.valvesoftware.com/wiki/Category:List_of_Shader_Parameters"
+                }
+
+        @class "DrawModelContext", ->
+            @function "GetEntitiy", ->
+                @returns "?Entity"
+            
+            @function "ForcedMaterialOverride", ->
+                @arg "mat", "Material"
+            
+            @function "DrawExtraPass", ->
+                @description {
+                    "Redraws the model." .. fmt.eol
+                    "Can be used to overlay multiple materials."
+                }
+        
+        -- right/up might be for usercmd?
+        -- clear = set everything to 0?
+        -- normalize = max is 1? (sum or max?)
+        @class "Vector3", ->
+            for var in *{"x", "y", "z"}
+                @variable var, ->
+                    @type "number"
+            
+            for fn in *{"Length", "LengthSqr", "Length2D", "Length2DSqr", "Dot", "Cross"}
+                @function fn, ->
+                    @returns "number"
+                    @flag "todo"
+            
+            for fn in *{"Clear", "Normalize"}
+                @function fn, ->
+                    @flag "todo"
+            
+            for fn in *{"Right", "Up", "Angles"}
+                @function fn, ->
+                    @returns "EulerAngles"
+                    @flag "todo"
+        
+        @class "EulerAngles", ->
+            for var in *{"pitch", "yaw", "roll"}
+                @variable var, ->
+                    @type "number"
+            
+            for fn in *{"Clear", "Forward", "Normalize", "Right", "Up"}
+                @function fn, ->
+                    @flag "todo"
+
+        @class "Trace", ->
+            @description {
+                fmt.link "https://developer.valvesoftware.com/wiki/UTIL_TraceLine#trace_t_.26tr", "Valve Wiki"
+            }
+            for {name, type} in *{
+                {"fraction", "float"}
+                {"entity", "Entity"}
+                {"plane.normal", "Vector3"} -- TODO: WHAT (how can you access this?)
+                {"contents", "integer"}
+                {"hitbox", "integer"}
+                {"hitgroup", "integer"}
+                {"allsolid", "boolean"}
+                {"startsolid", "boolean"}
+            }
+                @variable name, ->
+                    @type type
+
+        @class "PlayerInfo", ->
+            for {name, type} in *{
+                {"Name", "string"}
+                {"UserID", "integer"}
+                {"SteamID", "integer"}
+                {"IsBot", "boolean"}
+                {"IsGOTV", "boolean"}
+            }
+                @variable name, ->
+                    @type type
