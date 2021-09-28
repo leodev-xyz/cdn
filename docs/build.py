@@ -9,7 +9,7 @@ lua = LuaRuntime()
 make_doc = lua.eval(f"function(...) {Path('docs/tools/makedoc.lua').read_text()} end")
 
 out = Path("out/docs/")
-out.mkdir(exist_ok=True)
+out.mkdir(exist_ok=True, parents=True)
 
 
 input = Path("docs/docs")
