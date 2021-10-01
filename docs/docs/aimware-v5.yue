@@ -668,6 +668,7 @@ export default (fmt) =>
 
     @section "Callbacks", ->
         @flag "dont_validate"
+        @flag "dont_include_in_snippet"
 
         @text {
             fmt.danger {
@@ -731,6 +732,7 @@ export default (fmt) =>
 
     @section "Classes", ->
         @flag "dont_validate"
+        @flag "dont_include_in_snippet"
 
         @class "Entity", ->
             @function "GetName", ->
