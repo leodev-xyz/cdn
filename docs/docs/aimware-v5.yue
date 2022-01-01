@@ -862,7 +862,7 @@ export default (fmt) =>
                     @description {
                         fmt.warn {
                             "Deprecated; use "
-                            fmt.reference {"UserCmd", field\lower!}, field\lower!
+                            fmt.reference {"Classes", "UserCmd", field\lower!}, field\lower!
                             " instead."
                         }
                     }
@@ -873,7 +873,7 @@ export default (fmt) =>
                     @description {
                         fmt.warn {
                             "Deprecated; use "
-                            fmt.reference {"UserCmd", field\lower!}, field\lower!
+                            fmt.reference {"Classes", "UserCmd", field\lower!}, field\lower!
                             " instead."
                         }
                     }
