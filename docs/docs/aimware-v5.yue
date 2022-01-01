@@ -1191,3 +1191,10 @@ export default (fmt) =>
             }
                 @variable name, ->
                     @type type
+
+    @section "Types", ->
+        @flag "dont_validate"
+        @flag "dont_include_in_snippet"
+
+        @class "Texture", ->
+            @description "A texture used by Aimware for rendering."
