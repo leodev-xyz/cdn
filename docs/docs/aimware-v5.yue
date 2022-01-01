@@ -855,7 +855,7 @@ export default (fmt) =>
                     @type vartype or "any"
                     @description description if description?
             
-            for field in *{"ViewAngle", "SendPacket", "Buttons", "ForwardMove", "SideMove", "UpMove"}
+            for field in *{"ViewAngles", "SendPacket", "Buttons", "ForwardMove", "SideMove", "UpMove"}
                 @function "Set#{field}", ->
                     @arg "...", "[]any"
                     @flag "deprecated"
