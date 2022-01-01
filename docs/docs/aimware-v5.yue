@@ -831,7 +831,6 @@ export default (fmt) =>
                         @arg argname, argtype
 
         @class "UserCmd", ->
-            @flag "ref", "UserCmd"
             for {varname, vartype, description} in *{
                 { "command_number", "integer" }
                 { "tick_count", "integer" }
@@ -863,7 +862,7 @@ export default (fmt) =>
                     @description {
                         fmt.warn {
                             "Deprecated; use "
-                            fmt.reference {@ref.UserCmd, field\lower!}, field\lower!
+                            fmt.reference {"UserCmd", field\lower!}, field\lower!
                             " instead."
                         }
                     }
@@ -874,7 +873,7 @@ export default (fmt) =>
                     @description {
                         fmt.warn {
                             "Deprecated; use "
-                            fmt.reference {@ref.UserCmd, field\lower!}, field\lower!
+                            fmt.reference {"UserCmd", field\lower!}, field\lower!
                             " instead."
                         }
                     }
