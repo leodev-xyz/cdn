@@ -864,9 +864,9 @@ export mkdoc = (fmt) =>
                     @flag "deprecated"
                     @description {
                         fmt.warn {
-                            "Deprecated; use "
+                            "Deprecated; use the "
                             fmt.reference {"Classes", "UserCmd", field\lower!}, field\lower!
-                            " instead."
+                            " attribute instead."
                         }
                     }
                 
@@ -875,9 +875,9 @@ export mkdoc = (fmt) =>
                     @flag "deprecated"
                     @description {
                         fmt.warn {
-                            "Deprecated; use "
+                            "Deprecated; use the "
                             fmt.reference {"Classes", "UserCmd", field\lower!}, field\lower!
-                            " instead."
+                            " attribute instead."
                         }
                     }
         
@@ -1073,7 +1073,11 @@ export mkdoc = (fmt) =>
             
             @function "Set", ->
                 @arg "command", "string"
-                @description "If command is empty, the command will not be sent."
+                @description {
+                    "If command is empty ("
+                    fmt.code '""'
+                    "), the command will not be sent."
+                }
         
         @class "Socket", ->
             @description {
