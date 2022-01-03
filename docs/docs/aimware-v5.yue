@@ -1,5 +1,7 @@
 
-export default (fmt) =>
+export language = "lua"
+
+export mkdoc = (fmt) =>
     @section "Globals", ->
         @flag "globals"
 

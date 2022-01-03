@@ -2,6 +2,7 @@
 -- leadoc is not path, so add it
 package.path ..= ";./docs/leadoc/?.lua"
 
+import "leadoc.converter.snippets" as snippet_gen
 import doc, fmt from require "leadoc.doc"
 import stringify from require "leadoc.json"
 
@@ -13,7 +14,23 @@ with io.open file, "r"
     content = \read "*a"
     \close!
 
-doc = doc (load content)!, fmt
+data = (load content)!
+
+js_config = 
+    argument_start: "("
+    argument_close: ")"
+    no_arguments: "()"
+    return_prefix: ": "
+    scope: "javascript,typescript"
+
+doc = doc data.mkdoc, fmt
+
+export snippets = {}
+if data.language == "lua"
+    snippets["lua.json"] = stringify snippet_gen.generate_snippet doc, snippet_gen.configs.lua
+    snippets["yue.json"] = stringify snippet_gen.generate_snippet doc, snippet_gen.configs.yue
+else
+    snippets["js.json"] = stringify snippet_gen.generate_snippet doc, js_config
 
 export json = stringify doc.tree
-
+export language = data.language
