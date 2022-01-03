@@ -3,6 +3,7 @@
 package.path ..= ";./docs/leadoc/?.lua"
 
 import "leadoc.converter.snippets" as snippet_gen
+import "leadoc.converter.tsd" as tsd_gen
 import doc, fmt from require "leadoc.doc"
 import stringify from require "leadoc.json"
 
@@ -31,6 +32,7 @@ if data.language == "lua"
     snippets["yue.json"] = stringify snippet_gen.generate_snippet doc, snippet_gen.configs.yue
 else
     snippets["js.json"] = stringify snippet_gen.generate_snippet doc, js_config
+    snippets["tsr.d.ts"] = tsd_gen.generate_typescript doc
 
 export json = stringify doc.tree
 export language = data.language
