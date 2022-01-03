@@ -192,9 +192,9 @@ export mkdoc = (fmt) =>
             @description {
                 fmt.danger {
                     "These functions can only be called during the "
-                    fmt.reference {"Callbacks", "Draw"}
+                    fmt.reference {"Callbacks", "Draw"}, "Draw"
                     " callback. (with the exception of "
-                    fmt.reference {"Globals", "draw", "GetScreenSize"}
+                    fmt.reference {"Globals", "draw", "GetScreenSize"}, "draw.GetScreenSize"
                     ")"
                 }
             }
@@ -1003,7 +1003,7 @@ export mkdoc = (fmt) =>
                 @returns "?GuiObject"
                 @description {
                     "Like "
-                    fmt.reference {"Globals", "gui", "Reference"}
+                    fmt.reference {"Globals", "gui", "Reference"}, "gui.Reference"
                     " but relative to this gui object."
                 }
             
