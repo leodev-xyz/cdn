@@ -671,6 +671,7 @@ export mkdoc = (fmt) =>
     @section "Callbacks", ->
         @flag "dont_validate"
         @flag "dont_include_in_snippet"
+        @flag "dont_include_in_definition"
 
         @text {
             fmt.danger {
