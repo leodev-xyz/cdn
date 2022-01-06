@@ -1,0 +1,881 @@
+
+export language = "javascript"
+
+export mkdoc = (fmt) =>
+    @section "Globals", ->
+        @flag "globals"
+
+        @namespace "Global", ->
+            @description {
+                fmt.warn "Global is deprecated; avoid using it."
+            }
+            @flag "deprecated"
+            @flag "dont_include_in_snippet"
+            for real_fn in *{
+                {"Cheat", "Print"}
+                {"Cheat", "PrintChat"}
+                {"Cheat", "PrintColor"}
+                {"Cheat", "RegisterCallback"}
+                {"Cheat", "ExecuteCommand"}
+                {"Cheat", "FrameStage"}
+                {"Cheat", "GetUsername"}
+                {"Globals", "Tickcount"}
+                {"Globals", "Tickrate"}
+                {"Globals", "TickInterval"}
+                {"Globals", "Curtime"}
+                {"Globals", "Frametime"}
+                {"Local", "Latency"}
+                {"Local", "GetViewAngles"}
+                {"Local", "SetViewAngles"}
+                {"Local", "SetClantag"}
+                {"World", "GetMapName"}
+                {"Input", "IsKeyPressed"}
+                {"Input", "GetCursorPosition"}
+                {"Sound", "PlayMicrophone"}
+                {"Sound", "StopMicrophone"}
+            }
+                @function real_fn[2], ->
+                    @description fmt.warn {
+                        "Deprecated; use "
+                        fmt.reference {"Globals", real_fn[1], real_fn[2]}, "#{real_fn[1]}.#{real_fn[2]}"
+                        " instead."
+                    }
+            @function "PlaySound", ->
+                @description fmt.warn {
+                    "Deprecated; use "
+                    fmt.reference {"Globals", "Sound", "Play"}, "Sound.Play"
+                    " instead."
+                }
+        @namespace "Globals", ->
+            @function "Tickcount", ->
+                @returns "?integer"
+                @description "Returns the latest processed tick of the server you are connected to."
+            @function "Tickrate", ->
+                @returns "?integer"
+                @description "Returns the tickrate of the server. (ticks per second; eg 64/128)"
+            @function "TickInterval", ->
+                @returns "?float"
+                @description {
+                    "Returns the time between each tick. "
+                    "Equivalent to "
+                    fmt.code "1 / Globals.TickRate()"
+                }
+            @function "Curtime", ->
+                @returns "?float"
+                @description "Returns the time of the server. (in seconds)"
+            @function "Realtime", ->
+                @returns "float"
+                @description "Returns the time since the start of the game. (in seconds)"
+            @function "Frametime", ->
+                @returns "float"
+                @description "Returns the time the last frame took to render. (in seconds)"
+        @namespace "Sound", ->
+            @function "Play", ->
+                @arg "filename", "string"
+                @description {
+                    "Plays a sound. Only "
+                    fmt.code ".wav"
+                    " is supported."
+                }
+            @function "PlayMicrophone", ->
+                @arg "filename", "string"
+                @description "Plays a sound over voicechat."
+            @function "StopMicrophone", ->
+                @description {
+                    "Interrupts currently playing sound by "
+                    fmt.reference {"Globals", "Sound", "PlayMicrophone"}, "Sound.PlayMicrophone"
+                    "."
+                }
+        @namespace "Cheat", ->
+            @function "GetUsername", ->
+                @returns "string"
+                @description "Returns your Onetap username. If you are using the cracked version, this will return the steam name your account had at injection time."
+            @function "RegisterCallback", ->
+                @arg "callback", "string"
+                @arg "name", "string"
+                @description {
+                    "Registers a callback, check the "
+                    fmt.reference {"Callbacks"}, "Callbacks"
+                    " documentation for a list of all callbacks." .. fmt.eol
+                    fmt.codeblock "js", {
+                        "// function name must be declared globally" .. fmt.eol
+                        "function onCreateMove() {" .. fmt.eol
+                        "    // this gets called every tick" .. fmt.eol
+                        "}" .. fmt.eol
+                        'Cheat.RegisterCallback("CreateMove", "onCreateMove") // use the function NAME as string'
+                    }
+                }
+            @function "ExecuteCommand", ->
+                @arg "command", "string"
+                @description {
+                    "Executes a command in the CS:GO console." .. fmt.eol
+                    fmt.codeblock "js", {
+                        'Cheat.ExecuteCommand("say Hello world!")'
+                    }
+                }
+            @function "FrameStage", ->
+                @returns "integer"
+                @description {
+                    "Returns the current framestage." .. fmt.eol .. fmt.eol
+                    "0: Frame Start" .. fmt.eol
+                    "1: Frame NetUpdate Start" .. fmt.eol
+                    "2: Frame NetUpdate PostDataUpdate Start" .. fmt.eol
+                    "3: Frame NetUpdate PostDataUpdate End" .. fmt.eol
+                    "4: Frame NetUpdate End" .. fmt.eol
+                    "5: Frame Render Start" .. fmt.eol
+                    "6: Frame Render End" .. fmt.eol
+                    fmt.warn {
+                        "This function can only be called during a "
+                        fmt.reference {"Callbacks", "FrameStageNotify"}, "FrameStageNotify"
+                        " callback."
+                    }
+                }
+            @function "Print", ->
+                @arg "text", "string"
+                @description "Prints the provided text into the CS:GO console. (does not append a newline)"
+            @function "PrintChat", ->
+                @arg "test", "string"
+                colors = {"White", "Dark red", "Purple", "Green", "Lighter green", "Light green", "Red", "Gray", "Gold", "Gray", "Aqua, Blue", "Dark purple", "Light purple", "Light red"}
+                longest = 0
+                for name in *colors
+                    longest = #name if #name > longest
+                text = {"", "", "", ""}
+                for i, name in ipairs colors
+                    row = 1 + math.floor i / 4
+                    text[row] ..= "\\x0%x #{name}%s"\format i, " "\rep longest + 1 - #name
+                    text[row] ..= fmt.eol if i % 4 == 3
+
+                @description {
+                    "Prints the provided text into the CS:GO chat. (only visible to you)" .. fmt.eol .. fmt.eol
+                    "Special bytes for changing text color:" .. fmt.eol
+                    fmt.codeblock "", text
+                }
+            @function "PrintColor", ->
+                @arg "color", "[integer, integer, integer]"
+                @arg "text", "string"
+                @description {
+                    "Same as "
+                    fmt.reference {"Globals", "Cheat", "Print"}, "Cheat.Print"
+                    " but colored."
+                }
+        @namespace "Local", ->
+            @function "Latency", ->
+                @returns "float"
+                @description "Returns your latency (ping) to the server. (in seconds)"
+            @function "GetViewAngles", ->
+                @returns "[number, number, number]"
+                @description "Retruns your current clientside viewangle."
+            @function "SetViewAngles", ->
+                @arg "angle", "[number, number, number]"
+                @description "Sets your current clientside viewangle."
+            @function "SetClanTag", ->
+                @arg "clantag", "string"
+                @description "Changes your clantag."
+            @function "GetRealYaw", ->
+                @returns "float"
+            @function "GetFakeYaw", ->
+                @returns "float"
+            @function "GetSpread", ->
+                @returns "float"
+            @function "GetInaccuracy", ->
+                @returns "float"
+        @namespace "World", ->
+            @function "GetMapName", ->
+                @returns "string"
+                @description "Returns the name of the current active map. (de_dust2, de_mirage, ...)"
+            @function "GetServerString", ->
+                @returns "string"
+                @description "Returns the server name used in the watermark."
+        @namespace "Input", ->
+            @function "GetCursorPosition", ->
+                @returns "[integer, integer]"
+                @description "Returns the current positiuon of the mouse cursor."
+            @function "IsKeyPressed", ->
+                @arg "key", "integer"
+                @returns "boolean"
+                @description {
+                    "Returns if the key is currently being pressed." .. fmt.eol
+                    "Reference: "
+                    fmt.link "https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes"
+                }
+        @namespace "Render", ->
+            @description {
+                fmt.warn {
+                    "These functions can only be called during the "
+                    fmt.reference {"Callbacks", "Render"}, "Render"
+                    " callback. (with the exception of "
+                    fmt.reference {"Globals", "Render", "GetScreenSize"}, "Render.GetScreenSize"
+                    ")"
+                }
+            }
+            @function "String", ->
+                @arg "x", "integer"
+                @arg "y", "integer"
+                @arg "align", "integer"
+                @arg "text", "string"
+                @arg "color", "[integer, integer, integer, integer]"
+                @arg "font", "?integer", "0"
+                @description {
+                    "Renders the text at the position." .. fmt.eol
+                    "If align is equal to 0, the text is left-aligned. Any other value will make it centered." .. fmt.eol
+                    "This function does not support custom fonts." .. fmt.eol .. fmt.eol
+                    "See also: "
+                    fmt.reference {"Notes", "Font"}, "Note about font"
+                }
+            @function "TextSize", ->
+                @arg "text", "string"
+                @arg "font", "?integer", "0"
+                @returns "[integer, integer]"
+                @description {
+                    "Returns the width and height the text would occupy." .. fmt.eol
+                    "This function does not support custom fonts." .. fmt.eol .. fmt.eol
+                    "See also: "
+                    fmt.reference {"Notes", "Font"}, "Note about font"
+                }
+            @function "Line", ->
+                @arg "x1", "integer"
+                @arg "y1", "integer"
+                @arg "x2", "integer"
+                @arg "y2", "integer"
+                @arg "color", "[integer, integer, integer, integer]"
+            @function "Rect", ->
+                @arg "x", "integer"
+                @arg "y", "integer"
+                @arg "width", "integer"
+                @arg "height", "integer"
+                @arg "color", "[integer, integer, integer, integer]"
+            @function "GradientRect", ->
+                @arg "x", "integer"
+                @arg "y", "integer"
+                @arg "width", "integer"
+                @arg "height", "integer"
+                @arg "direction", "integer"
+                @arg "color1", "[integer, integer, integer, integer]"
+                @arg "color2", "[integer, integer, integer, integer]"
+                @description {
+                    "Renders a gradient rectangle." .. fmt.eol
+                    "If direction is equal to 0, the gradient is vertical, otherwise horizontal."
+                }
+            @function "Circle", ->
+                @arg "x", "integer"
+                @arg "y", "integer"
+                @arg "radius", "integer"
+                @arg "color", "[integer, integer, integer, integer]"
+            @function "FilledCircle", ->
+                @arg "x", "integer"
+                @arg "y", "integer"
+                @arg "radius", "integer"
+                @arg "color", "[integer, integer, integer, integer]"
+            @function "Polygon", ->
+                @arg "points", "[][integer, integer]"
+                @arg "color", "[integer, integer, integer, integer]"
+                @description {
+                    "Renders a polygon with as many points as you want." .. fmt.eol
+                    fmt.codeblock "js", {
+                        "function onDraw() {" .. fmt.eol
+                        "    // render a red triangle" .. fmt.eol
+                        "    Render.Polygon([[50, 0], [25, 50], [75, 50]], [255, 0, 0, 255]);" .. fmt.eol
+                        "};" .. fmt.eol
+                        'Cheat.RegisterCallback("Draw", "onDraw");'
+                    }
+                }
+            @function "WorldToScreen", ->
+                @arg "position", "[number, number, number]"
+                @returns "[?integer, ?integer]"
+                @description "Tranlates a world position to a screen position."
+            @function "AddFont", ->
+                @arg "name", "string"
+                @arg "size", "integer"
+                @arg "weight", "integer"
+                @returns "integer"
+                @description "Creates a new and returns its font identifier."
+            @function "FindFont", ->
+                @arg "name", "string"
+                @arg "size", "integer"
+                @arg "weight", "integer"
+                @returns "integer"
+                @description "Returns the font identifier if the font is found, otherwise 0."
+            @function "StringCustom", ->
+                @arg "x", "integer"
+                @arg "y", "integer"
+                @arg "align", "integer"
+                @arg "text", "string"
+                @arg "color", "[integer, integer, integer, integer]"
+                @arg "font", "?integer", "0"
+                @description {
+                    "Renders the text at the position." .. fmt.eol
+                    "If align is equal to 0, the text is left-aligned. Any other value will make it centered."
+                }
+            @function "TextSizeCustom", ->
+                @arg "text", "string"
+                @arg "font", "?integer", "0"
+                @returns "[integer, integer]"
+                @description {
+                    "Returns the width and height the text would occupy."
+                }
+            @function "AddTexture", ->
+                @arg "filename", "string"
+                @returns "integer"
+                @description {
+                    "Imports image from the file as texture and returns a texture id for it."
+                    "Supported formats: .bmp .dds .dib .jdr .jpg .pfm .png .ppm .tga"
+                }
+            @function "TexturedRect", ->
+                @arg "x", "integer"
+                @arg "y", "integer"
+                @arg "width", "integer"
+                @arg "height", "integer"
+                @arg "texture", "integer"
+                @description {
+                    fmt.code "texture"
+                    " is the texture id returned by "
+                    fmt.reference {"Globals", "Render", "AddTexture"}, "Render.AddTexture"
+                }
+            @function "GetScreenSize", ->
+                @returns "[integer, integer]"
+
+        @namespace "UI", ->
+            @function "GetValue", ->
+                @arg "path", "Path"
+                @returns "number"
+                @description {
+                    "Returns the value of the UI element." .. fmt.eol .. fmt.eol
+                    "Example:" .. fmt.eol
+                    fmt.codeblock "javascript", {
+                        "function getFakelagLimit() {" .. fmt.eol
+                        '    if(!UI.GetValue("Anti-Aim", "Fake-Lag", "Enabled"))' .. fmt.eol
+                        "        return 0; // fakelag is disabled" .. fmt.eol
+                        '    return UI.GetValue("Anti-Aim", "Fake-Lag", "Limit");' .. fmt.eol
+                        "}"
+                    }
+                }
+            @function "SetValue", ->
+                @arg "path", "Path"
+                @arg "value", "number"
+                @description {
+                    "Sets the value of the UI element." .. fmt.eol .. fmt.eol
+                    "Example:" .. fmt.eol
+                    fmt.codeblock "javascript", {
+                        "function disableFakeLag() {" .. fmt.eol
+                        '    UI.SetValue("Anti-Aim", "Fake-Lag", "Enabled", false);' .. fmt.eol
+                        "}" .. fmt.eol
+                        "function toggleFakeLag() {" .. fmt.eol
+                        '    var fakelag_enabled = UI.GetValue("Anti-Aim", "Fake-Lag", "Enabled");' .. fmt.eol
+                        '    UI.SetValue("Anti-Aim", "Fake-Lag", "Enabled", !fakelag_enabled);' .. fmt.eol
+                        "}"
+                    }
+                }
+            @function "AddCheckbox", ->
+                @arg "name", "string"
+            @function "AddSliderInt", ->
+                @arg "name", "string"
+                @arg "min", "integer"
+                @arg "max", "integer"
+            @function "AddSliderFloat", ->
+                @arg "name", "string"
+                @arg "min", "float"
+                @arg "max", "float"
+            @function "AddHotkey", ->
+                @arg "name", "string"
+                @description {
+                    "Use "
+                    fmt.reference {"Globals", "UI", "IsHotkeyActive"}, "UI.IsHotkeyActive"
+                    " to check if the hotkey is active. (don't use "
+                    fmt.reference {"Globals", "UI", "GetValue"}, "UI.GetValue"
+                    "!)"
+                }
+            @function "AddLabel", ->
+                @arg "text", "string"
+            @function "AddDropdown", ->
+                @arg "name", "string"
+                @arg "options", "[]string"
+                @description {
+                    "Using "
+                    fmt.reference {"Globals", "UI", "GetValue"}, "UI.GetValue"
+                    " on a dropdown returns a zero-indexed "
+                    fmt.type "integer"
+                    "." .. fmt.eol .. fmt.eol
+                    "Example:" .. fmt.eol
+                    fmt.codeblock "javascript", {
+                        'UI.AddDropdown("sample dropdown", ["option 0", "option 1", "option 2"])' .. fmt.eol
+                        fmt.eol
+                        "// by default the first option is selected" .. fmt.eol
+                        'UI.GetValue("sample dropdown") // 0' .. fmt.eol
+                        'UI.SetValue("sample dropdown", 2) // sets dropdown to "option 2"'
+                    }
+                }
+            @function "AddMultiDropdown", ->
+                @arg "name", "string"
+                @arg "options", "[]string"
+                @description {
+                    "Using "
+                    fmt.reference {"Globals", "UI", "GetValue"}, "UI.GetValue"
+                    " on a multidropdown returns a bitwise "
+                    fmt.type "integer"
+                    "." .. fmt.eol .. fmt.eol
+                    "Example:" .. fmt.eol
+                    fmt.codeblock "javascript", {
+                        'UI.AddMultiDropdown("sample multidropdown", ["option 0", "option 1", "option 2"])' .. fmt.eol
+                        fmt.eol
+                        'UI.GetValue("sample multidropdown") // 0, because nothing is set' .. fmt.eol
+                        'UI.SetValue("sample multidropdown", 0b101) // selects option 0 and 2 (bitwise)' .. fmt.eol
+                        'UI.GetValue("sample multidropdown") // 5, because option 0 and 2 are set'
+                    }
+                }
+            @function "AddColorPicker", ->
+                @arg "name", "string"
+            @function "AddTextbox", ->
+                @arg "name", "string"
+                @description {
+                    "Use "
+                    fmt.reference {"Globals", "UI", "GetString"}, "UI.GetString"
+                    " instea dof "
+                    fmt.reference {"Globals", "UI", "GetValue"}, "UI.GetValue"
+                    " on textboxes."
+                }
+            @function "SetEnabled", ->
+                @arg "path", "Path"
+                @arg "value", "boolean"
+                @description {
+                    "Enables/disables UI elements. "
+                    "Disabled UI elements are not shown in the menu."
+                }
+            @function "GetString", ->
+                @arg "path", "Path"
+                @returns "string"
+                @description {
+                    "For "
+                    fmt.bold "Textbox"
+                    "."
+                }
+            @function "GetColor", ->
+                @arg "path", "Path"
+                @returns "[integer, integer, integer, integer]"
+            @function "SetColor", ->
+                @arg "path", "Path"
+                @arg "color", "[integer, integer, integer, integer]"
+            @function "IsHotkeyActive", ->
+                @arg "path", "Path"
+                @returns "string"
+            @function "ToggleHotkey", ->
+                @arg "path", "Path"
+                @returns "boolean"
+                @description "Returns the new hotkey state."
+            @function "IsMenuOpen", ->
+                @returns "boolean"
+        @namespace "Convar", ->
+            for {name, type} in *{
+                {"Int", "integer"}
+                {"Float", "float"}
+                {"String", "string"}
+            }
+                @function "Get#{name}", ->
+                    @arg "name", "string"
+                    @returns "?#{type}"
+                @function "Set#{name}", ->
+                    @arg "name", "string"
+                    @arg "value", type
+        @namespace "Event", ->
+            @description {
+                fmt.warn {
+                    "These functions can only be called during a "
+                    fmt.reference {"Callbacks"}, "Callback"
+                    "."
+                }
+            }
+            for {name, type} in *{
+                {"Int", "integer"}
+                {"Float", "float"}
+                {"String", "string"}
+            }
+                @function "Get#{name}", ->
+                    @arg "name", "string"
+                    @returns "?#{type}"
+        @namespace "Entity", ->
+            @function "GetEntities", ->
+                @returns "[]integer"
+                @description "Returns the entityindex of every entity."
+            @function "GetEntitiesByClassId", ->
+                @arg "class_id", "integer"
+                @returns "[]integer"
+            @function "GetPlayers", ->
+                @returns "[]integer"
+            @function "GetEnemies", ->
+                @returns "[]integer"
+            @function "GetTeammates", ->
+                @returns "[]integer"
+            @function "GetLocalPlayer", ->
+                @returns "?integer"
+            @function "GetGameRulesProxy", ->
+                @returns "integer"
+            @function "GetEntityFromUserID", ->
+                @arg "userid", "integer"
+                @returns "?integer"
+            for name in *{
+                "Teammate"
+                "Enemy"
+                "Bot"
+                "LocalPlayer"
+                "Valid"
+                "Alive"
+                "Dormant"
+            }
+                @function "Is#{name}", ->
+                    @arg "entity_index", "integer"
+                    @returns "boolean"
+            @function "GetClassID", ->
+                @arg "entity_index", "integer"
+                @returns "integer"
+            @function "GetClassName", ->
+                @arg "entity_index", "integer"
+                @returns "string"
+            @function "GetName", ->
+                @arg "entity_index", "integer"
+                @returns "string"
+            @function "GetWeapon", ->
+                @arg "entity_index", "integer"
+                @returns "integer"
+            @function "GetWeapons", ->
+                @arg "entity_index", "integer"
+                @returns "[]integer"
+            @function "GetRenderOrigin", ->
+                @arg "entity_index", "integer"
+                @returns "[number, number, number]"
+            @function "GetRenderBox", ->
+                @arg "entity_index", "integer"
+                @returns "[boolean, number, number, number, number]"
+                @description {
+                    "[visible, min_x, min_y, max_x, max_y]"
+                }
+            @function "GetProp", ->
+                @arg "entity_index", "integer"
+                @arg "table", "string"
+                @arg "propname", "string"
+                @returns "any"
+            @function "SetProp", ->
+                @arg "entity_index", "integer"
+                @arg "table", "string"
+                @arg "propname", "string"
+                @arg "value"
+            @function "GetHitboxPosition", ->
+                @arg "entity_index", "integer"
+                @arg "bone", "integer"
+                @returns "[number, number, number]"
+            @function "GetEyePosition", ->
+                @arg "entity_index", "integer"
+                @returns "[number, number, number]"
+        @namespace "Trace", ->
+            @function "Line", ->
+                @arg "entity_index", "integer"
+                @arg "start", "[number, number, number]"
+                @arg "end", "[number, number, number]"
+                @returns "[?integer, float]"
+                @description {
+                    "[target_entity_index, fraction]" .. fmt.eol
+                    "if target_entity_index is 0, it means it didn't anyone." .. fmt.eol
+                    "fraction of 1.0 means it didn't hit anything."
+                }
+            @function "Bullet", ->
+                @arg "source_entity_index", "integer"
+                @arg "target_entity_index", "integer"
+                @arg "start", "[number, number, number]"
+                @arg "end", "[number, number, number]"
+                @returns "?[integer, integer, boolean, integer]"
+                @description {
+                    "[target_entity_index, damage, visiblity, hitbox]" .. fmt.eol
+                    "Returrns "
+                    fmt.code "undefined"
+                    " if the target is not hit."
+                    fmt.warn {
+                        "If you have teamcheck enabled, this will always return 0 damage on teammates."
+                    }
+                }
+        @namespace "UserCMD", ->
+            @description {
+                fmt.warn {
+                    "These functions can only be called during a "
+                    fmt.reference {"Callbacks", "CreateMove"}, "CreateMove"
+                    " callback."
+                }
+            }
+            @function "SetMovement", ->
+                @arg "movement", "[number, number, number]"
+            @function "GetMovement", ->
+                @returns "[number, number, number]"
+            @function "SetAngles", ->
+                @arg "angles", "[number, number, number]"
+            @function "ForceJump", ->
+                @arg "value", "boolean"
+            @function "ForceCrouch", ->
+                @arg "value", "boolean"
+        @namespace "AntiAim", ->
+            @function "GetOverride", ->
+                @returns "boolean"
+                @description {
+                    "Returns if the antiaim is managed by a script." .. fmt.eol
+                }
+            @function "SetOverride", ->
+                @arg "managed", "integer"
+                @description {
+                    fmt.warn {
+                        "This function excepts an integer! (1 or 0)" .. fmt.eol
+                        "It does not accept a boolean! (true or false)"
+                    }
+                }
+            @function "SetRealOffset", ->
+                @arg "degress", "integer"
+            @function "SetLBYOffset", ->
+                @arg "degress", "integer"
+            @function "SetFakeOffset", ->
+                @arg "degress", "number"
+        @namespace "Exploit", ->
+            @function "GetCharge", ->
+                @returns "float"
+                @description {
+                    "Returns the doubletap charge percentange. (between 0 and 1)" .. fmt.eol
+                    "Returns -1 if disabled."
+                }
+            @function "Recharge"
+            @function "EnableRecharge"
+            @function "DisableRecharge"
+        @namespace "Ragebot", ->
+            @description {
+                fmt.warn {
+                    "These functions can only be called during a "
+                    fmt.reference {"Callbacks", "CreateMove"}, "CreateMove"
+                    " callback."
+                }
+            }
+            @function "GetTarget", ->
+                @returns "integer"
+                @description {
+                    "Returns the entity index of the tqargetted entity or 0 if no entity is being targetted."
+                }
+            @function "IgnoreTarget", ->
+                @arg "entity_index", "integer"
+                @description "Ignores the specified entity for the current tick."
+            @function "ForceTarget", ->
+                @arg "entity_index", "integer"
+                @description "Forces the ragebot to shoot the specified entity for the current tick."
+            @function "ForceTargetSafety", ->
+                @arg "entity_index", "integer"
+                @description "Forces the ragebot to only shoot safepoint for the specified entity for the current tick."
+            @function "ForceTargetHitchance", ->
+                @arg "entity_index", "integer"
+                @arg "hitchance", "integer"
+                @description {
+                    "Forces the ragebot to only shoot with at least the specified hitchance for the specified entity for the current tick." .. fmt.eol
+                    "Hitchance is an integer between 0 and 100."
+                }
+            @function "ForceTargetMinimumDamage", ->
+                @arg "entity_index", "integer"
+                @arg "damage", "integer"
+                @description {
+                    "Forces the ragebot to shoot for at least the specified damage for the specified entity for the current tick." .. fmt.eol
+                    "Damage 0 is treated as dynamic min damage. Damage over 100 is treated as "
+                    fmt.code "HP + (damage - 100)"
+                    "."
+                }
+            @function "ForceHitboxSafety", ->
+                @arg "hitbox", "integer"
+                @description "Forces the ragebot to only shoot safepoint of the specified hitbox for the current tick."
+        @namespace "Material", ->
+            @description {
+                "Ressources: " .. fmt.eol
+                fmt.link "https://developer.valvesoftware.com/wiki/Category:List_of_Shader_Parameters"
+                fmt.eol
+                fmt.link "https://developer.valvesoftware.com/wiki/VertexLitGeneric"
+            }
+            @function "Create", ->
+                @arg "name", "string"
+                @returns "boolean"
+                @description {
+                    "Creates a material and retruns if the creationm was successful." .. fmt.eol
+                    'The material is added to the "Visible type" dropdown in the chams section of the menu.'
+                }
+            @function "Destroy", ->
+                @arg "name", "string"
+                @returns "boolean"
+                @description {
+                    "Destroys a material and returns if the destruction was successful."
+                }
+            @function "Get", ->
+                @arg "name", "string"
+                @returns "integer"
+                @description {
+                    "Returns the material index of the material."
+                    fmt.warn {
+                        "The material index is volatile and may change between callback executions, so don't store/cache this value."
+                    }
+                    fmt.warn {
+                        "This function can only be called during a "
+                        fmt.reference {"Callbacks", "Material"}, "Material"
+                        " callback."
+                    }
+                }
+            @function "SetKeyValue", ->
+                @arg "material_index", "integer"
+                @arg "key", "string"
+                @arg "value", "string"
+                @description {
+                    "Overrides value of the material."
+                    fmt.warn {
+                        "This function can only be called during a "
+                        fmt.reference {"Callbacks", "Material"}, "Material"
+                        " callback."
+                    }
+                }
+            @function "Refresh", ->
+                @arg "material_index", "integer"
+                @description {
+                    "Refreshes the material. (call after using "
+                    fmt.reference {"Globals", "Material", "SetKeyValue"}, "Material.SetKeyValue"
+                    ")"
+                    fmt.warn {
+                        "This function can only be called during a "
+                        fmt.reference {"Callbacks", "Material"}, "Material"
+                        " callback."
+                    }
+                }
+
+    @section "Callbacks", ->
+        @flag "dont_validate"
+        @flag "dont_include_in_snippet"
+        @flag "dont_include_in_definition"
+        @text {
+            "Callbacks are functions that you can set which will be called when certain events happen." .. fmt.eol
+            "You can register your callbacks using the "
+            fmt.reference {"Globals", "Cheat", "RegisterCallback"}, "Cheat.RegisterCallback"
+            " function." .. fmt.eol
+            fmt.codeblock "javascript", {
+                "function onDraw() {" .. fmt.eol
+                "    // draws white text in the top left" .. fmt.eol
+                '    Render.String(0, 0, 0, "Hello World", [255, 255, 255, 255]);' .. fmt.eol
+                "}" .. fmt.eol
+                'Cheat.RegisterCallback("Draw", "onDraw");'
+            }
+        }
+
+        @function "CreateMove", ->
+            @description {
+                "This callback is everytime a user command is sent to the server (once every tick)." .. fmt.eol
+                fmt.reference {"Globals", "UserCMD"}, "UserCMD"
+                " and "
+                fmt.reference {"Globals", "Ragebot"}, "Ragebot"
+                " can be used during this callback."
+            }
+
+        @function "Draw", ->
+            @description {
+                "Called everytime a frame is drawn (once every frame)." .. fmt.eol
+                fmt.reference {"Globals", "Render"}, "Render"
+                " can be used during this callback."
+            }
+
+        @function "FrameStageNotify", ->
+            @description {
+                "Called everytime the framestage changes (multiple times every frame)." .. fmt.eol
+                fmt.reference {"Globals", "Cheat", "FraneStage"}, "Cheat.FrameStage"
+                " can be used during this callback."
+            }
+        
+        @function "Unload", ->
+            @description {
+                "Called when the script is unloaded, this can be used for cleanup. (e.g. resetting "
+                fmt.reference {"Globals", "AntiAim", "SetOverride"}
+                ")" .. fmt.eol
+                "This may not be called if the game is closed (or crashes)."
+            }
+        
+        @function "Material", ->
+            @description {
+                "Called once every frame before the "
+                fmt.reference {"Callbacks", "Draw"}, "Draw"
+                " callback." .. fmt.eol
+                fmt.reference {"Globals", "Material", "Get"}, "Material.Get"
+                ", "
+                fmt.reference {"Globals", "Material", "SetKeyValue"}, "Material.SetKeyValue"
+                " and "
+                fmt.reference {"Globals", "Material", "Refresh"}, "Material.Refresh"
+                " can be used during this callback."
+            }
+        
+        @function "ragebot_fire", ->
+            @description {
+                "Called everytime the ragebot shoots at an entity." .. fmt.eol .. fmt.eol
+                "Arguments: (use "
+                fmt.reference {"Globals", "Event"}, "Event"
+                "to get the arguments)" .. fmt.eol
+                fmt.codeblock "", {
+                    " field name     type      description" .. fmt.eol
+                    "-------------- --------- --------------------------------------------------------------" .. fmt.eol
+                    " exploit        integer   0 = no exploit, 1 = 1st dt shot or hideshot, 2 = 2nd dt shot" .. fmt.eol
+                    " target_index   integer   entityindex of the target" .. fmt.eol
+                    " hitchance      integer   hitchance of the shot (between 0 and 100)" .. fmt.eol
+                    " safepoint      integer   targetting a safepoint" .. fmt.eol
+                    " hitbox         integer   targetted hitbox" .. fmt.eol
+                }
+                fmt.warn {
+                    "The "
+                    fmt.code "safepoint"
+                    " argument appears to be very inconsistent."
+                }
+            }
+
+        @function "player_say", ->
+            @description {
+                "Called everytime a player says something." .. fmt.eol .. fmt.eol
+                "Arguments: (use "
+                fmt.reference {"Globals", "Event"}, "Event"
+                "to get the arguments)" .. fmt.eol
+                fmt.codeblock "", {
+                    " field name   type      description"
+                    "------------ --------- ------------------------------"
+                    " userid       integer   userid of the message author"
+                    " text         string    content of the message"
+                }
+                fmt.warn {
+                    "This callback appears to only work sporadically and not on valve distributed servers."
+                }
+            }
+
+        @text {
+            fmt.header 3, "CS:GO Callbacks"
+            "You can also use CS:GO's builtin events. You can use "
+            fmt.reference {"Globals", "Event"}, "Event"
+            " to access their arguments/fields." .. fmt.eol
+            "Full event list: "
+            fmt.link "https://wiki.alliedmods.net/Counter-Strike:_Global_Offensive_Events"
+            fmt.eol .. fmt.eol
+            "Example:" .. fmt.eol
+            fmt.codeblock "javascript", {
+                "function on_player_death() {" .. fmt.eol
+                '    entity = Entity.GetEntityFromUserID(Event.GetInt("userid"));' .. fmt.eol
+                '    Cheat.PrintChat(" \\x02" + Entity.GetName(entity) + " \\x01died!");' .. fmt.eol
+                "}" .. fmt.eol
+                'Cheat.RegisterCallback("player_death", "on_player_death");'
+            }
+        }
+
+    @section "Notes", ->
+        @flag "dont_validate"
+        @flag "dont_include_in_snippet"
+
+        @section "Font", ->
+            @text {
+                "Fonts 0 - 6 have a special meaning, see the table below." .. fmt.eol
+                "Fonts 7 - 48 (only even numbers) are variations of the default font with the size of the font id. (eg id 16 is default font with size 16)" .. fmt.eol
+                fmt.codeblock "", {
+                    "0  Default CS:GO font" .. fmt.eol
+                    "1  Bold font" .. fmt.eol
+                    "2  Small font" .. fmt.eol
+                    "3  Small & bold" .. fmt.eol
+                    "4  Big font" .. fmt.eol
+                    "5  Icons" .. fmt.eol
+                    "6  Small icons"
+                }
+            }
+        
+        @section "Path", ->
+        @section "Hitbox", ->
+        @section "Bone", ->
