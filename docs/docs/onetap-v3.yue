@@ -877,5 +877,7 @@ export mkdoc = (fmt) =>
             }
         
         @section "Path", ->
-        @section "Hitbox", ->
-        @section "Bone", ->
+            @flag "__tsd_typedef", "Array<string>"
+            @text {
+                "A path is a list of 1 to 4 strings."
+            }
