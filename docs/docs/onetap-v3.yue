@@ -829,10 +829,10 @@ export mkdoc = (fmt) =>
                 fmt.reference {"Globals", "Event"}, "Event"
                 "to get the arguments)" .. fmt.eol
                 fmt.codeblock "", {
-                    " field name   type      description"
-                    "------------ --------- ------------------------------"
-                    " userid       integer   userid of the message author"
-                    " text         string    content of the message"
+                    " field name   type      description" .. fmt.eol
+                    "------------ --------- ------------------------------" .. fmt.eol
+                    " userid       integer   userid of the message author" .. fmt.eol
+                    " text         string    content of the message" .. fmt.eol
                 }
                 fmt.warn {
                     "This callback appears to only work sporadically and not on valve distributed servers."
