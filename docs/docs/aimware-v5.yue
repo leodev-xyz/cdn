@@ -924,7 +924,7 @@ export mkdoc = (fmt) =>
                 }
             
             @function "GetValue", ->
-                @returns "[]any"
+                @returns "any"
             
             @function "SetOpenKey", ->
                 @arg "key", "number"
