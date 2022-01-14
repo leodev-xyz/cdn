@@ -164,10 +164,10 @@ export mkdoc = (fmt) =>
                 @description "Returns your latency (ping) to the server. (in seconds)"
             @function "GetViewAngles", ->
                 @returns "[number, number, number]"
-                @description "Retruns your current clientside viewangle."
+                @description "Returns your current clientside viewangles."
             @function "SetViewAngles", ->
                 @arg "angle", "[number, number, number]"
-                @description "Sets your current clientside viewangle."
+                @description "Sets your current clientside viewangles."
             @function "SetClanTag", ->
                 @arg "clantag", "string"
                 @description "Changes your clantag."
@@ -690,7 +690,7 @@ export mkdoc = (fmt) =>
                 @arg "name", "string"
                 @returns "boolean"
                 @description {
-                    "Creates a material and retruns if the creationm was successful." .. fmt.eol
+                    "Creates a material and returns if the creationm was successful." .. fmt.eol
                     'The material is added to the "Visible type" dropdown in the chams section of the menu.'
                 }
             @function "Destroy", ->
