@@ -164,7 +164,7 @@ export mkdoc = (fmt) =>
                 @description "Returns your latency (ping) to the server. (in seconds)"
             @function "GetViewAngles", ->
                 @returns "[number, number, number]"
-                @description "Retruns your current clientside viewangle."
+                @description "Returns your current clientside viewangle."
             @function "SetViewAngles", ->
                 @arg "angle", "[number, number, number]"
                 @description "Sets your current clientside viewangle."
